@@ -1,44 +1,173 @@
-hostname R5
 
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R5
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+clock timezone DUN 1 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
 ipv6 unicast-routing
 ipv6 cef
-
-no ip domain lookup
-clock timezone DUN 1
-
-line con 0
-privilege level 15
-line vty 0 4
-privilege level 15
-	
-interface Loopback 0
-description R5 loopback.(zone 4)
-ip address 172.31.127.5 255.255.255.0
-ipv6 address 2019:100::5/64
-no shutdown
-
-interface e0/0
-description link to R17.(zone 4-1)
-ip address 172.17.175.5 255.255.255.0
-ipv6 address 2019:feed:0:175::5/64
-no shutdown
-
-interface e0/1
-description link to R6.(zone 4)
-ip address 10.4.56.5 255.255.255.0
-ipv6 address 2019:cafe:0:56::5/64
-no shutdown
-
-interface e0/2
-description link to R7.(zone 4)
-ip address 10.4.56.5 255.255.255.0
-ipv6 address 2019:cafe:0:57::5/64
-no shutdown
-
-interface e0/3
-description #N/A
-ip address #N/A 255.255.255.0
-ipv6 address #N/A/64
-shutdown
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ description R5 loopback.(zone 4)
+ ip address 172.31.127.5 255.255.255.0
+ ipv6 address 2019:100::5/64
+!
+interface Tunnel200
+ no shutdown
+ ip address 192.200.0.5 255.255.255.0
+ no ip redirects
+ ip nhrp map 192.200.0.1 172.17.119.1
+ ip nhrp map multicast 172.17.119.1
+ ip nhrp network-id 1
+ ip nhrp nhs 192.200.0.1
+ tunnel source Ethernet0/0
+ tunnel mode gre multipoint
+!
+interface Tunnel206
+ no shutdown
+ description DMVPN_SPOKE
+ no ip address
+ no ip redirects
+ ipv6 address 2019:C0DE:200::5/64
+ ipv6 nhrp map 2019:C0DE:200::1/64 2019:FEED:0:119::1
+ ipv6 nhrp map multicast 2019:FEED:0:119::1
+ ipv6 nhrp network-id 6
+ ipv6 nhrp nhs 2019:C0DE:200::1
+ tunnel source 2019:FEED:0:175::5
+ tunnel mode gre multipoint ipv6
+!
+interface Ethernet0/0
+ no shutdown
+ description link to R17.(zone 4-1)
+ ip address 172.17.175.5 255.255.255.0
+ ipv6 address 2019:FEED:0:175::5/64
+!
+interface Ethernet0/1
+ no shutdown
+ description link to R6.(zone 4)
+ ip address 10.4.56.5 255.255.255.0
+ ipv6 address 2019:CAFE:0:56::5/64
+!
+interface Ethernet0/2
+ no shutdown
+ description link to R7.(zone 4)
+ no ip address
+ shutdown
+ ipv6 address 2019:CAFE:0:57::5/64
+!
+interface Ethernet0/3
+ no shutdown
+ description #N/A
+ no ip address
+ shutdown
+!
 ip default-gateway 172.17.175.17
-ipv6 route ::/0 2019:feed:0:175::17
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 172.17.175.17
+ip route 10.2.0.0 255.255.0.0 192.200.0.13 name r5->R13,15,16
+ip route 10.5.0.0 255.255.0.0 192.200.0.1 name r5->R9,10,11,12
+ip route 10.32.0.0 255.252.0.0 192.200.0.1 name r5->R1,2,3,4_R3,8,14_R22,23,24_R2,24
+ip route 192.100.19.0 255.255.255.0 192.200.0.1 name r5->GRE_R1-R9
+!
+ipv6 route 2019:ABBA::/64 2019:C0DE:200::13 name r5->R13,15,16
+ipv6 route 2019:ABBA::/32 2019:C0DE:200::13 name r5->R13,15,16
+ipv6 route 2019:BEEF::/64 2019:C0DE:200::1 name r5->R9,10,11,12
+ipv6 route 2019:BEEF::/32 2019:C0DE:200::1 name r5->R9,10,11,12
+ipv6 route 2019:C0DE:100:19::/64 2019:C0DE:200::1 name r5->GRE_R1-R9
+ipv6 route 2019:F1FA::/32 2019:C0DE:200::1 name r5->R1,2,3,4_R3,8,14_R22,23,24_R2,24
+ipv6 route ::/0 2019:FEED:0:175::17
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ privilege level 15
+ logging synchronous
+line aux 0
+line vty 0 4
+ privilege level 15
+ login
+ transport input none
+!
+!
+end

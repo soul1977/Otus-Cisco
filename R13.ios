@@ -1,45 +1,155 @@
-hostname R13
 
+!
+! Last configuration change at 14:13:16 DUN Sun Mar 24 2019
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R13
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+clock timezone DUN 1 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
 ipv6 unicast-routing
 ipv6 cef
-
-no ip domain lookup
-clock timezone DUN 1
-
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ description R13 loopback.(zone 2)
+ ip address 172.31.127.13 255.255.255.0
+ ipv6 address 2019:100::13/64
+!
+interface Tunnel200
+ no shutdown
+ ip address 192.200.0.13 255.255.255.0
+ no ip redirects
+ ip nhrp map 192.200.0.1 172.17.119.1
+ ip nhrp map multicast 172.17.119.1
+ ip nhrp network-id 13
+ ip nhrp nhs 192.200.0.1
+ tunnel source Ethernet0/0
+ tunnel mode gre multipoint
+!
+interface Ethernet0/0
+ no shutdown
+ description link to R20.(zone 2-1)
+ ip address 172.17.130.13 255.255.255.0
+ ipv6 address 2019:FEED:0:1320::13/64
+!
+interface Ethernet0/1
+ no shutdown
+ description link to R16.(zone 2)
+ ip address 10.2.136.13 255.255.255.0
+ ipv6 address 2019:ABBA:0:1316::13/64
+!
+interface Ethernet0/2
+ no shutdown
+ description link to R15.(zone 2)
+ ip address 10.2.135.13 255.255.255.0
+ ipv6 address 2019:ABBA:0:1315::13/64
+!
+interface Ethernet0/3
+ no shutdown
+ description #N/A
+ no ip address
+ shutdown
+!
+ip default-gateway 172.17.130.20
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 172.17.130.20
+ip route 10.4.0.0 255.255.0.0 192.200.0.5 name r13->R5,6,7
+ip route 10.5.0.0 255.255.0.0 192.200.0.1 name r13->R9,10,11,12
+ip route 10.32.0.0 255.252.0.0 192.200.0.1 name r13->R1,2,3,4_R3,8,14_R22,23,24_R2,24
+ip route 192.100.19.0 255.255.255.0 192.200.0.1 name r13->GRE_R1-R9
+!
+ipv6 route ::/0 2019:FEED:0:1320::20
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
 line con 0
-privilege level 15
+ privilege level 15
+ logging synchronous
+line aux 0
 line vty 0 4
-privilege level 15
-	
-interface Loopback 0
-description R13 loopback.(zone 2)
-ip address 172.31.127.13 255.255.255.0
-ipv6 address 2019:100::13/64
-no shutdown
-
-interface e0/0
-description link to R20.(zone 2-1)
-ip address 172.17.130.13 255.255.255.0
-ipv6 address 2019:feed:0:1320::13/64
-no shutdown
-
-interface e0/1
-description link to R16.(zone 2)
-ip address 10.2.136.13 255.255.255.0
-ipv6 address 2019:abba:0:1316::13/64
-no shutdown
-
-interface e0/2
-description link to R15.(zone 2)
-ip address 10.2.135.13 255.255.255.0
-ipv6 address 2019:abba:0:1315::13/64
-no shutdown
-
-interface e0/3
-description #N/A
-ip address #N/A 255.255.255.0
-ipv6 address #N/A/64
-shutdown
-
-ip default-gateway 172.17.130.20	
-ipv6 route ::/0 2019:feed:0:1320::20
+ privilege level 15
+ login
+ transport input none
+!
+!
+end
