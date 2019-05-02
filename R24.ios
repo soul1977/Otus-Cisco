@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 03:04:35 DUN Fri Apr 5 2019
+! Last configuration change at 17:22:05 DUN Mon Apr 15 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -94,27 +94,40 @@ interface Ethernet0/1
  no shutdown
  description link to R22.(zone 32)
  ip address 10.32.224.24 255.255.255.0
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
  ipv6 address 2019:F1FA:32:2224::24/64
 !
 interface Ethernet0/2
  no shutdown
  description link to R23.(zone 32)
  ip address 10.32.234.24 255.255.255.0
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
  ipv6 address 2019:F1FA:32:2324::24/64
 !
 interface Ethernet0/3
  no shutdown
- description #N/A
- no ip address
- shutdown
+ description link to R25.(zone 35)
+ ip address 10.33.245.24 255.255.255.0
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
 !
 router ospf 10
  router-id 1.1.1.24
  auto-cost reference-bandwidth 1000
+ area 10 filter-list prefix ZONE_42_LIST in
+ area 10 virtual-link 1.1.1.2
  passive-interface default
  no passive-interface Ethernet0/0
+ no passive-interface Ethernet0/1
+ no passive-interface Ethernet0/2
+ no passive-interface Ethernet0/3
+ network 10.32.224.24 0.0.0.0 area 0
+ network 10.32.234.24 0.0.0.0 area 0
  network 10.33.224.24 0.0.0.0 area 10
- network 172.31.127.24 0.0.0.0 area 10
+ network 10.33.245.24 0.0.0.0 area 10
+ network 172.31.127.24 0.0.0.0 area 0
 !
 ip forward-protocol nd
 !
@@ -122,6 +135,11 @@ ip forward-protocol nd
 no ip http server
 no ip http secure-server
 !
+!
+ip prefix-list ZONE_42_LIST seq 5 deny 10.35.143.0/24
+ip prefix-list ZONE_42_LIST seq 6 deny 10.35.148.0/24
+ip prefix-list ZONE_42_LIST seq 7 deny 10.35.38.0/24
+ip prefix-list ZONE_42_LIST seq 15 permit 0.0.0.0/0 le 32
 !
 !
 !

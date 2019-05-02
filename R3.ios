@@ -1,7 +1,5 @@
 
 !
-! Last configuration change at 11:51:06 DUN Fri Apr 5 2019
-!
 version 15.5
 service timestamps debug datetime msec
 service timestamps log datetime msec
@@ -119,6 +117,7 @@ router ospf 10
  router-id 1.1.1.3
  priority 50
  auto-cost reference-bandwidth 1000
+ area 42 stub no-summary
  passive-interface default
  no passive-interface Ethernet0/0
  no passive-interface Ethernet0/1
