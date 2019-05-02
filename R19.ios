@@ -1,5 +1,6 @@
+
 !
-! Last configuration change at 14:52:19 DUN Sat Mar 23 2019
+! Last configuration change at 00:51:29 DUN Sat Apr 20 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -68,7 +69,7 @@ track 18 ip sla 18 reachability
 track 186 ip sla 186 reachability
  delay down 10 up 5
 !
-!
+! 
 !
 !
 !
@@ -82,26 +83,32 @@ track 186 ip sla 186 reachability
 !
 !
 interface Loopback0
+ no shutdown
  description R19 loopback.(zone 1)
- ip address 172.31.127.19 255.255.255.0
- ipv6 address 2019:100::19/64
+ ip address 172.31.127.19 255.255.255.255
+ ipv6 address FE80::19 link-local
+ ipv6 address 2019:100::19/128
 !
 interface Ethernet0/0
+ no shutdown
  description link to R1.(zone 1-34)
  ip address 172.17.119.19 255.255.255.0
  ipv6 address 2019:FEED:0:119::19/64
 !
 interface Ethernet0/1
+ no shutdown
  description link to R20.(zone 1)
  ip address 10.1.190.19 255.255.255.0
  ipv6 address 2019:B055:0:1920::19/64
 !
 interface Ethernet0/2
+ no shutdown
  description link to R17.(zone 1)
  ip address 10.1.179.19 255.255.255.0
  ipv6 address 2019:B055:0:1719::19/64
 !
 interface Ethernet0/3
+ no shutdown
  description link to R18.(zone 1)
  ip address 10.1.189.19 255.255.255.0
  ipv6 address 2019:B055:0:1819::19/64
@@ -119,10 +126,10 @@ ip route 172.17.175.0 255.255.255.0 10.1.179.17 50 name r19->r17->R5
 ip route 172.17.189.0 255.255.255.0 10.1.189.18 name r19->r18->R9
 !
 ip access-list extended acl_R19_to_R18_icmp
- remark allow icmp from R19 to R18
+ remark allow icmp from R19 to R18 
  permit icmp host 10.1.189.19 host 10.1.189.18
 ip access-list extended acl_R1_to_R13
- remark allow traffic from R1 to R13
+ remark allow traffic from R1 to R13 
  permit ip 172.17.119.0 0.0.0.255 172.17.130.0 0.0.0.255
 ip access-list extended acl_R1_to_R5
  remark allow traffic from R1 to R5
@@ -140,11 +147,11 @@ ip sla 186
  timeout 1500
  frequency 3
 ip sla schedule 186 life forever start-time now
-ipv6 route 2019:FEED:0:175::/64 2019:B055:0:1819::18 10 track 186 name ->r17->R5_main
 ipv6 route 2019:FEED:0:175::/64 2019:B055:0:1719::17 50 name ->r17->R5
+ipv6 route 2019:FEED:0:175::/64 2019:B055:0:1819::18 10 track 186 name ->r17->R5_main
 ipv6 route 2019:FEED:0:189::/64 2019:B055:0:1819::18 name r19->r18->R9
-ipv6 route 2019:FEED:0:1320::/64 2019:B055:0:1819::18 10 track 186 name r19->r18->R13
 ipv6 route 2019:FEED:0:1320::/64 2019:B055:0:1920::20 50 name r19->r20->R13
+ipv6 route 2019:FEED:0:1320::/64 2019:B055:0:1819::18 10 track 186 name r19->r18->R13
 !
 route-map R19_PBR_SLA permit 10
  match ip address acl_R19_to_R18_icmp

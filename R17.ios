@@ -1,51 +1,144 @@
-hostname R17
 
+!
+! Last configuration change at 00:53:32 DUN Sat Apr 20 2019
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+clock timezone DUN 1 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
 ipv6 unicast-routing
 ipv6 cef
-
-no ip domain lookup
-clock timezone DUN 1
-
-line con 0
-privilege level 15
-line vty 0 4
-privilege level 15
-	
-interface Loopback 0
-description R17 loopback.(zone 1)
-ip address 172.31.127.17 255.255.255.0
-ipv6 address 2019:100::17/64
-no shutdown
-
-interface e0/0
-description link to R5.(zone 1-4)
-ip address 172.17.175.17 255.255.255.0
-ipv6 address 2019:feed:0:175::17/64
-no shutdown
-
-interface e0/1
-description link to R18.(zone 1)
-ip address 10.1.178.17 255.255.255.0
-ipv6 address 2019:b055:0:1718::17/64
-no shutdown
-
-interface e0/2
-description link to R19.(zone 1)
-ip address 10.1.179.17 255.255.255.0
-ipv6 address 2019:b055:0:1719::17/64
-no shutdown
-
-interface e0/3
-description link to R20.(zone 1)
-ip address 10.1.170.17 255.255.255.0
-ipv6 address 2019:b055:0:1720::17/64
-no shutdown
-
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ description R17 loopback.(zone 1)
+ ip address 172.31.127.17 255.255.255.255
+ ipv6 address FE80::17 link-local
+ ipv6 address 2019:100::17/128
+!
+interface Ethernet0/0
+ no shutdown
+ description link to R5.(zone 1-4)
+ ip address 172.17.175.17 255.255.255.0
+ ipv6 address 2019:FEED:0:175::17/64
+!
+interface Ethernet0/1
+ no shutdown
+ description link to R18.(zone 1)
+ ip address 10.1.178.17 255.255.255.0
+ ipv6 address 2019:B055:0:1718::17/64
+!
+interface Ethernet0/2
+ no shutdown
+ description link to R19.(zone 1)
+ ip address 10.1.179.17 255.255.255.0
+ ipv6 address 2019:B055:0:1719::17/64
+!
+interface Ethernet0/3
+ no shutdown
+ description link to R20.(zone 1)
+ ip address 10.1.170.17 255.255.255.0
+ ipv6 address 2019:B055:0:1720::17/64
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
 ip route 172.17.119.0 255.255.255.0 10.1.179.19 name r17->r19->R1
-ipv6 route 2019:feed:0:119::/64 2019:b055:0:1719::19 name ->r19->R1
-
-ip route 172.17.189.0 255.255.255.0 10.1.178.18 name r17->r18->R9
-ipv6 route 2019:feed:0:189::/64 2019:b055:0:1718::18 name ->r18->R9
-
 ip route 172.17.130.0 255.255.255.0 10.1.170.20 name r17->r20->R13
-ipv6 route 2019:feed:0:1320::/64 2019:b055:0:1720::20 name r17->r20->R13
+ip route 172.17.189.0 255.255.255.0 10.1.178.18 name r17->r18->R9
+!
+ipv6 route 2019:FEED:0:119::/64 2019:B055:0:1719::19 name ->r19->R1
+ipv6 route 2019:FEED:0:189::/64 2019:B055:0:1718::18 name ->r18->R9
+ipv6 route 2019:FEED:0:1320::/64 2019:B055:0:1720::20 name r17->r20->R13
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ privilege level 15
+ logging synchronous
+line aux 0
+line vty 0 4
+ privilege level 15
+ login
+ transport input none
+!
+!
+end
