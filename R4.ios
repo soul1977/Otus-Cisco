@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 02:32:05 DUN Fri Apr 5 2019
+! Last configuration change at 00:35:15 DUN Sat Apr 20 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -79,8 +79,10 @@ redundancy
 interface Loopback0
  no shutdown
  description R4 loopback.(zone 34)
- ip address 172.31.127.4 255.255.255.0
- ipv6 address 2019:100::4/64
+ ip address 172.31.127.4 255.255.255.255
+ ipv6 address FE80::4 link-local
+ ipv6 address 2019:100::4/128
+ ipv6 ospf 6 area 0
 !
 interface Ethernet0/0
  no shutdown
@@ -88,7 +90,11 @@ interface Ethernet0/0
  ip address 10.34.34.4 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::4 link-local
  ipv6 address 2019:F1FA:34:34::4/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/1
  no shutdown
@@ -108,7 +114,11 @@ interface Ethernet0/3
  ip address 10.34.24.4 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::4 link-local
  ipv6 address 2019:F1FA:34:24::4/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 router ospf 10
  router-id 1.1.1.4
@@ -125,6 +135,10 @@ ip forward-protocol nd
 !
 no ip http server
 no ip http secure-server
+!
+ipv6 router ospf 6
+ router-id 6.1.1.4
+ auto-cost reference-bandwidth 1000
 !
 !
 !

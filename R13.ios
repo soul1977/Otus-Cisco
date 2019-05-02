@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 02:38:19 DUN Tue Apr 9 2019
+! Last configuration change at 00:50:24 DUN Sat Apr 20 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -79,8 +79,10 @@ redundancy
 interface Loopback0
  no shutdown
  description R13 loopback.(zone 2)
- ip address 172.31.127.13 255.255.255.0
- ipv6 address 2019:100::13/64
+ ip address 172.31.127.13 255.255.255.255
+ ipv6 address FE80::13 link-local
+ ipv6 address 2019:100::13/128
+ ipv6 ospf 6 area 0
 !
 interface Tunnel200
  no shutdown
@@ -101,11 +103,16 @@ interface Tunnel206
  description DMVPN_SPOKE
  no ip address
  no ip redirects
+ ipv6 address FE80::206:13 link-local
  ipv6 address 2019:C0DE:200::13/64
  ipv6 nhrp map 2019:C0DE:200::1/64 2019:FEED:0:119::1
  ipv6 nhrp map multicast 2019:FEED:0:119::1
  ipv6 nhrp network-id 6
  ipv6 nhrp nhs 2019:C0DE:200::1
+ ipv6 ospf 6 area 0
+ ipv6 ospf network point-to-multipoint
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
  tunnel source 2019:FEED:0:1320::13
  tunnel mode gre multipoint ipv6
 !
@@ -121,7 +128,11 @@ interface Ethernet0/1
  ip address 10.2.136.13 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::13 link-local
  ipv6 address 2019:ABBA:0:1316::13/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/2
  no shutdown
@@ -129,7 +140,11 @@ interface Ethernet0/2
  ip address 10.2.135.13 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::13 link-local
  ipv6 address 2019:ABBA:0:1315::13/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/3
  no shutdown
@@ -169,6 +184,10 @@ ipv6 route 2019:CAFE::/64 2019:C0DE:200::5 name r13->R5,6,7
 ipv6 route 2019:CAFE::/32 2019:C0DE:200::5 name r13->R5,6,7
 ipv6 route 2019:F1FA::/32 2019:C0DE:200::1 name r13->R1,2,3,4_R3,8,14_R22,23,24_R2,24
 ipv6 route ::/0 2019:FEED:0:1320::20
+ipv6 router ospf 6
+ router-id 6.1.1.13
+ auto-cost reference-bandwidth 1000
+!
 !
 !
 !

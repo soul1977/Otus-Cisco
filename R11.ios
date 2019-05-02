@@ -1,13 +1,13 @@
 
 !
-! Last configuration change at 00:44:57 DUN Sat Apr 20 2019
+! Last configuration change at 00:56:55 DUN Sat Apr 20 2019
 !
 version 15.5
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R25
+hostname R11
 !
 boot-start-marker
 boot-end-marker
@@ -78,63 +78,40 @@ redundancy
 !
 interface Loopback0
  no shutdown
- description R25 loopback.(zone 33)
- ip address 172.31.127.25 255.255.255.255
- ipv6 address FE80::25 link-local
- ipv6 address 2019:100::25/128
- ipv6 ospf 6 area 10
+ description R11 loopback.(zone 5)
+ ip address 172.31.127.11 255.255.255.255
+ ipv6 address FE80::11 link-local
+ ipv6 address 2019:100::11/128
 !
 interface Ethernet0/0
  no shutdown
- description link to R24.(zone 35)
- ip address 10.33.245.25 255.255.255.0
- ip ospf dead-interval 6
- ip ospf hello-interval 2
- ipv6 address FE80::25 link-local
- ipv6 ospf 6 area 10
- ipv6 ospf hello-interval 2
- ipv6 ospf dead-interval 6
+ description link to R12.(zone 5)
+ ip address 10.5.112.11 255.255.255.0
+ ipv6 address 2019:BEEF:0:1112::11/64
 !
 interface Ethernet0/1
  no shutdown
- description link to R2.(zone 35)
- ip address 10.33.225.25 255.255.255.0
- ip ospf dead-interval 6
- ip ospf hello-interval 2
- ipv6 address FE80::25 link-local
- ipv6 ospf 6 area 10
- ipv6 ospf hello-interval 2
- ipv6 ospf dead-interval 6
+ description link to R10.(zone 5)
+ ip address 10.5.101.11 255.255.255.0
+ ipv6 address 2019:BEEF:0:1011::11/64
 !
 interface Ethernet0/2
  no shutdown
+ description #N/A
  no ip address
  shutdown
 !
 interface Ethernet0/3
  no shutdown
- no ip address
- shutdown
-!
-router ospf 10
- router-id 1.1.1.25
- auto-cost reference-bandwidth 1000
- passive-interface default
- no passive-interface Ethernet0/0
- no passive-interface Ethernet0/1
- network 10.33.225.25 0.0.0.0 area 10
- network 10.33.245.25 0.0.0.0 area 10
- network 172.31.127.25 0.0.0.0 area 10
+ description link to R9.(zone 5)
+ ip address 10.5.91.11 255.255.255.0
+ ipv6 address 2019:BEEF:0:911::11/64
 !
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
-!
-ipv6 router ospf 6
- router-id 6.1.1.25
- auto-cost reference-bandwidth 1000
 !
 !
 !
