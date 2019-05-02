@@ -1,0 +1,45 @@
+hostname R9
+
+ipv6 unicast-routing
+ipv6 cef
+
+no ip domain lookup
+clock timezone DUN 1
+
+line con 0
+privilege level 15
+line vty 0 4
+privilege level 15
+	
+interface Loopback 0
+description R9 loopback.(zone 5)
+ip address 172.31.127.9 255.255.255.0
+ipv6 address 2019:100::9/64
+no shutdown
+
+interface e0/0
+description link to R18.(zone 5-1)
+ip address 172.17.189.9 255.255.255.0
+ipv6 address 2019:feed:0:189::9/64
+no shutdown
+
+interface e0/1
+description link to R12.(zone 5)
+ip address 10.5.92.9 255.255.255.0
+ipv6 address 2019:beef:0:912::9/64
+no shutdown
+
+interface e0/2
+description link to R10.(zone 5)
+ip address 10.5.90.9 255.255.255.0
+ipv6 address 2019:beef:0:910::9/64
+no shutdown
+
+interface e0/3
+description link to R11.(zone 5)
+ip address 10.5.91.9 255.255.255.0
+ipv6 address 2019:beef:0:911::9/64
+no shutdown
+
+ip default-gateway 172.17.189.18
+ipv6 route ::/0 2019:feed:0:189::18
