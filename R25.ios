@@ -1,13 +1,11 @@
 
 !
-! Last configuration change at 17:43:20 DUN Mon Apr 15 2019
-!
 version 15.5
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R2
+hostname R25
 !
 boot-start-marker
 boot-end-marker
@@ -78,57 +76,42 @@ redundancy
 !
 interface Loopback0
  no shutdown
- description R2 loopback.(zone 33,34)
- ip address 172.31.127.2 255.255.255.0
- ipv6 address 2019:100::2/64
+ description R25 loopback.(zone 33)
+ ip address 172.31.127.25 255.255.255.0
 !
 interface Ethernet0/0
  no shutdown
- description link to R24.(zone 33)
- ip address 10.33.224.2 255.255.255.0
+ description link to R24.(zone 35)
+ ip address 10.33.245.25 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
- ipv6 address 2019:F1FA:33:224::2/64
 !
 interface Ethernet0/1
  no shutdown
- description link to R1.(zone 34)
- ip address 10.34.12.2 255.255.255.0
+ description link to R2.(zone 35)
+ ip address 10.33.225.25 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
- ipv6 address 2019:F1FA:34:12::2/64
 !
 interface Ethernet0/2
  no shutdown
- description link to R25.(zone 35)
- ip address 10.33.225.2 255.255.255.0
- ip ospf dead-interval 6
- ip ospf hello-interval 2
+ no ip address
+ shutdown
 !
 interface Ethernet0/3
  no shutdown
- description link to R4.(zone 34)
- ip address 10.34.24.2 255.255.255.0
- ip ospf dead-interval 6
- ip ospf hello-interval 2
- ipv6 address 2019:F1FA:34:24::2/64
+ no ip address
+ shutdown
 !
 router ospf 10
- router-id 1.1.1.2
- priority 100
+ router-id 1.1.1.25
  auto-cost reference-bandwidth 1000
- area 10 filter-list prefix ZONE_42_LIST in
- area 10 virtual-link 1.1.1.24
  passive-interface default
  no passive-interface Ethernet0/0
  no passive-interface Ethernet0/1
- no passive-interface Ethernet0/2
- no passive-interface Ethernet0/3
- network 10.33.224.2 0.0.0.0 area 10
- network 10.33.225.2 0.0.0.0 area 10
- network 10.34.12.2 0.0.0.0 area 0
- network 10.34.24.2 0.0.0.0 area 0
- network 172.31.127.2 0.0.0.0 area 0
+ network 10.33.225.25 0.0.0.0 area 10
+ network 10.33.245.25 0.0.0.0 area 10
+ network 172.31.127.25 0.0.0.0 area 10
 !
 ip forward-protocol nd
 !
@@ -136,11 +119,6 @@ ip forward-protocol nd
 no ip http server
 no ip http secure-server
 !
-!
-ip prefix-list ZONE_42_LIST seq 5 deny 10.35.143.0/24
-ip prefix-list ZONE_42_LIST seq 6 deny 10.35.148.0/24
-ip prefix-list ZONE_42_LIST seq 7 deny 10.35.38.0/24
-ip prefix-list ZONE_42_LIST seq 15 permit 0.0.0.0/0 le 32
 !
 !
 !
