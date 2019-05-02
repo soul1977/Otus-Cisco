@@ -1,0 +1,45 @@
+hostname R1
+
+ipv6 unicast-routing
+ipv6 cef
+
+no ip domain lookup
+clock timezone DUN 1
+
+line con 0
+privilege level 15
+line vty 0 4
+privilege level 15
+	
+interface Loopback 0
+description R1 loopback.(zone 34)
+ip address 172.31.127.1 255.255.255.0
+ipv6 address 2019:100::1/64
+no shutdown
+
+interface e0/0
+description link to R19.(zone 34-1)
+ip address 172.17.119.1 255.255.255.0
+ipv6 address 2019:feed:0:119::1/64
+no shutdown
+
+interface e0/1
+description link to R2.(zone 34)
+ip address 10.34.12.1 255.255.255.0
+ipv6 address 2019:f1fa:34:12::1/64
+no shutdown
+
+interface e0/2
+description link to R3.(zone 34)
+ip address 10.34.13.1 255.255.255.0
+ipv6 address 2019:f1fa:34:13::1/64
+no shutdown
+
+interface e0/3
+description #N/A
+ip address #N/A 255.255.255.0
+ipv6 address #N/A/64
+shutdown
+
+ip default-gateway 172.17.119.19
+ipv6 route ::/0 2019:feed:0:119::19

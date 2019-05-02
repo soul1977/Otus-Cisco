@@ -1,0 +1,45 @@
+hostname R13
+
+ipv6 unicast-routing
+ipv6 cef
+
+no ip domain lookup
+clock timezone DUN 1
+
+line con 0
+privilege level 15
+line vty 0 4
+privilege level 15
+	
+interface Loopback 0
+description R13 loopback.(zone 2)
+ip address 172.31.127.13 255.255.255.0
+ipv6 address 2019:100::13/64
+no shutdown
+
+interface e0/0
+description link to R20.(zone 2-1)
+ip address 172.17.130.13 255.255.255.0
+ipv6 address 2019:feed:0:1320::13/64
+no shutdown
+
+interface e0/1
+description link to R16.(zone 2)
+ip address 10.2.136.13 255.255.255.0
+ipv6 address 2019:abba:0:1316::13/64
+no shutdown
+
+interface e0/2
+description link to R15.(zone 2)
+ip address 10.2.135.13 255.255.255.0
+ipv6 address 2019:abba:0:1315::13/64
+no shutdown
+
+interface e0/3
+description #N/A
+ip address #N/A 255.255.255.0
+ipv6 address #N/A/64
+shutdown
+
+ip default-gateway 172.17.130.20	
+ipv6 route ::/0 2019:feed:0:1320::20

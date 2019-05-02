@@ -1,0 +1,51 @@
+hostname R20
+
+ipv6 unicast-routing
+ipv6 cef
+
+no ip domain lookup
+clock timezone DUN 1
+
+line con 0
+privilege level 15
+line vty 0 4
+privilege level 15
+	
+interface Loopback 0
+description R20 loopback.(zone 1)
+ip address 172.31.127.20 255.255.255.0
+ipv6 address 2019:100::20/64
+no shutdown
+
+interface e0/0
+description link to R13.(zone 1-2)
+ip address 172.17.130.20 255.255.255.0
+ipv6 address 2019:feed:0:1320::20/64
+no shutdown
+
+interface e0/1
+description link to R19.(zone 1)
+ip address 10.1.190.20 255.255.255.0
+ipv6 address 2019:b055:0:1920::20/64
+no shutdown
+
+interface e0/2
+description link to R18.(zone 1)
+ip address 10.1.180.20 255.255.255.0
+ipv6 address 2019:b055:0:1820::20/64
+no shutdown
+
+interface e0/3
+description link to R17.(zone 1)
+ip address 10.1.170.20 255.255.255.0
+ipv6 address 2019:b055:0:1720::20/64
+no shutdown
+
+ip route 172.17.175.0 255.255.255.0 10.1.170.17 name r20->r17->R5
+ipv6 route 2019:feed:0:175::/64 2019:b055:0:1720::17 name ->r17->R5
+
+ip route 172.17.189.0 255.255.255.0 10.1.180.18 name r20->r18->R9
+ipv6 route 2019:feed:0:189::/64 2019:b055:0:1820::18 name ->r18->R9
+
+ip route 172.17.119.0 255.255.255.0 10.1.190.19 name r20->r19->R1
+ipv6 route 2019:feed:0:119::/64 2019:b055:0:1920::19 name ->r19->R1
