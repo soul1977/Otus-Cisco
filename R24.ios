@@ -1,13 +1,13 @@
 
 !
-! Last configuration change at 00:54:26 DUN Tue Apr 9 2019
+! Last configuration change at 03:04:35 DUN Fri Apr 5 2019
 !
 version 15.5
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R2
+hostname R24
 !
 boot-start-marker
 boot-end-marker
@@ -78,53 +78,43 @@ redundancy
 !
 interface Loopback0
  no shutdown
- description R2 loopback.(zone 33,34)
- ip address 172.31.127.2 255.255.255.0
- ipv6 address 2019:100::2/64
+ description R24 loopback.(zone 32,33)
+ ip address 172.31.127.24 255.255.255.0
+ ipv6 address 2019:100::24/64
 !
 interface Ethernet0/0
  no shutdown
- description link to R24.(zone 33)
- ip address 10.33.224.2 255.255.255.0
+ description link to R2.(zone 33)
+ ip address 10.33.224.24 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
- ipv6 address 2019:F1FA:33:224::2/64
+ ipv6 address 2019:F1FA:33:224::24/64
 !
 interface Ethernet0/1
  no shutdown
- description link to R1.(zone 34)
- ip address 10.34.12.2 255.255.255.0
- ip ospf dead-interval 6
- ip ospf hello-interval 2
- ipv6 address 2019:F1FA:34:12::2/64
+ description link to R22.(zone 32)
+ ip address 10.32.224.24 255.255.255.0
+ ipv6 address 2019:F1FA:32:2224::24/64
 !
 interface Ethernet0/2
+ no shutdown
+ description link to R23.(zone 32)
+ ip address 10.32.234.24 255.255.255.0
+ ipv6 address 2019:F1FA:32:2324::24/64
+!
+interface Ethernet0/3
  no shutdown
  description #N/A
  no ip address
  shutdown
 !
-interface Ethernet0/3
- no shutdown
- description link to R4.(zone 34)
- ip address 10.34.24.2 255.255.255.0
- ip ospf dead-interval 6
- ip ospf hello-interval 2
- ipv6 address 2019:F1FA:34:24::2/64
-!
 router ospf 10
- router-id 1.1.1.2
- priority 100
+ router-id 1.1.1.24
  auto-cost reference-bandwidth 1000
- area 10 virtual-link 1.1.1.24
  passive-interface default
  no passive-interface Ethernet0/0
- no passive-interface Ethernet0/1
- no passive-interface Ethernet0/3
- network 10.33.224.2 0.0.0.0 area 10
- network 10.34.12.2 0.0.0.0 area 0
- network 10.34.24.2 0.0.0.0 area 0
- network 172.31.127.2 0.0.0.0 area 0
+ network 10.33.224.24 0.0.0.0 area 10
+ network 172.31.127.24 0.0.0.0 area 10
 !
 ip forward-protocol nd
 !
