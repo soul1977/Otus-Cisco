@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 02:53:24 DUN Tue Apr 9 2019
+! Last configuration change at 00:55:27 DUN Sat Apr 20 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -79,8 +79,10 @@ redundancy
 interface Loopback0
  no shutdown
  description R9 loopback.(zone 5)
- ip address 172.31.127.9 255.255.255.0
- ipv6 address 2019:100::9/64
+ ip address 172.31.127.9 255.255.255.255
+ ipv6 address FE80::9 link-local
+ ipv6 address 2019:100::9/128
+ ipv6 ospf 6 area 0
 !
 interface Tunnel19
  no shutdown
@@ -94,7 +96,12 @@ interface Tunnel19
 interface Tunnel196
  no shutdown
  no ip address
+ ipv6 address FE80::196:9 link-local
  ipv6 address 2019:C0DE:100:19::9/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf network point-to-point
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
  tunnel source 2019:FEED:0:189::9
  tunnel mode gre ipv6
  tunnel destination 2019:FEED:0:119::1
@@ -153,6 +160,8 @@ ipv6 route 2019:CAFE::/64 2019:C0DE:100:19::1 name r9->R5,6,7
 ipv6 route 2019:CAFE::/32 2019:C0DE:100:19::1 name r9->R5,6,7
 ipv6 route 2019:F1FA::/32 2019:C0DE:100:19::1 name r9->R1,2,3,4_R3,8,14_R22,23,24_R2,24
 ipv6 route ::/0 2019:FEED:0:189::18
+ipv6 router ospf 6
+!
 !
 !
 !

@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 17:22:05 DUN Mon Apr 15 2019
+! Last configuration change at 00:46:32 DUN Sat Apr 20 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -79,8 +79,10 @@ redundancy
 interface Loopback0
  no shutdown
  description R24 loopback.(zone 32,33)
- ip address 172.31.127.24 255.255.255.0
- ipv6 address 2019:100::24/64
+ ip address 172.31.127.24 255.255.255.255
+ ipv6 address FE80::24 link-local
+ ipv6 address 2019:100::24/128
+ ipv6 ospf 6 area 10
 !
 interface Ethernet0/0
  no shutdown
@@ -88,7 +90,11 @@ interface Ethernet0/0
  ip address 10.33.224.24 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::24 link-local
  ipv6 address 2019:F1FA:33:224::24/64
+ ipv6 ospf 6 area 10
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/1
  no shutdown
@@ -96,7 +102,11 @@ interface Ethernet0/1
  ip address 10.32.224.24 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::24 link-local
  ipv6 address 2019:F1FA:32:2224::24/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/2
  no shutdown
@@ -104,7 +114,11 @@ interface Ethernet0/2
  ip address 10.32.234.24 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::24 link-local
  ipv6 address 2019:F1FA:32:2324::24/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/3
  no shutdown
@@ -112,6 +126,10 @@ interface Ethernet0/3
  ip address 10.33.245.24 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::24 link-local
+ ipv6 ospf 6 area 10
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 router ospf 10
  router-id 1.1.1.24
@@ -140,6 +158,11 @@ ip prefix-list ZONE_42_LIST seq 5 deny 10.35.143.0/24
 ip prefix-list ZONE_42_LIST seq 6 deny 10.35.148.0/24
 ip prefix-list ZONE_42_LIST seq 7 deny 10.35.38.0/24
 ip prefix-list ZONE_42_LIST seq 15 permit 0.0.0.0/0 le 32
+ipv6 router ospf 6
+ router-id 6.1.1.24
+ auto-cost reference-bandwidth 1000
+ area 10 virtual-link 6.1.1.2
+!
 !
 !
 !

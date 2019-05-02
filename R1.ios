@@ -1,7 +1,5 @@
 
 !
-! Last configuration change at 02:45:36 DUN Tue Apr 9 2019
-!
 version 15.5
 service timestamps debug datetime msec
 service timestamps log datetime msec

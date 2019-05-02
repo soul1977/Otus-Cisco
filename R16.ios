@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 02:03:38 DUN Fri Apr 5 2019
+! Last configuration change at 00:49:16 DUN Sat Apr 20 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -79,8 +79,10 @@ redundancy
 interface Loopback0
  no shutdown
  description R16 loopback.(zone 2)
- ip address 172.31.127.16 255.255.255.0
- ipv6 address 2019:100::16/64
+ ip address 172.31.127.16 255.255.255.255
+ ipv6 address FE80::16 link-local
+ ipv6 address 2019:100::16/128
+ ipv6 ospf 6 area 0
 !
 interface Ethernet0/0
  no shutdown
@@ -88,7 +90,11 @@ interface Ethernet0/0
  ip address 10.2.156.16 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::16 link-local
  ipv6 address 2019:ABBA:0:1516::16/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/1
  no shutdown
@@ -97,7 +103,11 @@ interface Ethernet0/1
  ip ospf dead-interval 6
  ip ospf hello-interval 2
  ip ospf cost 1000
+ ipv6 address FE80::16 link-local
  ipv6 address 2019:ABBA:0:1316::16/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/2
  no shutdown
@@ -126,6 +136,10 @@ ip forward-protocol nd
 !
 no ip http server
 no ip http secure-server
+!
+ipv6 router ospf 6
+ router-id 6.1.1.16
+ auto-cost reference-bandwidth 1000
 !
 !
 !
