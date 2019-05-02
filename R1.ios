@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 02:32:11 DUN Fri Apr 5 2019
+! Last configuration change at 02:45:36 DUN Tue Apr 9 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -85,6 +85,9 @@ interface Loopback0
 interface Tunnel19
  no shutdown
  ip address 192.100.19.1 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
  tunnel source Ethernet0/0
  tunnel destination 172.17.189.9
 !
@@ -103,6 +106,9 @@ interface Tunnel200
  no ip redirects
  ip nhrp map multicast dynamic
  ip nhrp network-id 1
+ ip ospf network point-to-multipoint
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
  tunnel source 172.17.119.1
  tunnel mode gre multipoint
 !
@@ -151,9 +157,13 @@ router ospf 10
  passive-interface default
  no passive-interface Ethernet0/1
  no passive-interface Ethernet0/2
+ no passive-interface Tunnel19
+ no passive-interface Tunnel200
  network 10.34.12.1 0.0.0.0 area 0
  network 10.34.13.1 0.0.0.0 area 0
  network 172.31.127.1 0.0.0.0 area 0
+ network 192.100.19.1 0.0.0.0 area 0
+ network 192.200.0.1 0.0.0.0 area 0
 !
 ip default-gateway 172.17.119.19
 ip forward-protocol nd
