@@ -1,0 +1,3 @@
+Мы доработали наши стенды. Добавили возомжность эмулировать образы L2(коммутаторы)
+Так же добавили Wireshark, для анализа трафика на интерфейсах.
+Для работы с Wireshark необходимо установить его себе локально(https://www.wireshark.org/download.html) и в файле(для Windows) C:\Program Files\EVE-NG\wireshark_wrapper.bat поменять поле SET PASSWORD="eve" на SET PASSWORD="123123Zz"
