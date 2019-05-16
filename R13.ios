@@ -1,8 +1,8 @@
 
 !
-! Last configuration change at 00:50:24 DUN Sat Apr 20 2019
+! Last configuration change at 03:23:11 DUN Mon May 13 2019
 !
-version 15.5
+version 15.4
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
@@ -15,20 +15,11 @@ boot-end-marker
 !
 !
 no aaa new-model
-!
-!
-!
-bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
 clock timezone DUN 1 0
 mmi polling-interval 60
 no mmi auto-configure
 no mmi pvc
 mmi snmp-timeout 180
-!
-!
-!
-!
-!
 !
 !
 !
@@ -55,8 +46,6 @@ multilink bundle-name authenticated
 !
 !
 !
-!
-cts logging verbose
 !
 !
 !
@@ -90,7 +79,7 @@ interface Tunnel200
  no ip redirects
  ip nhrp map 192.200.0.1 172.17.119.1
  ip nhrp map multicast 172.17.119.1
- ip nhrp network-id 13
+ ip nhrp network-id 1
  ip nhrp nhs 192.200.0.1
  ip ospf network point-to-multipoint
  ip ospf dead-interval 6
@@ -102,24 +91,27 @@ interface Tunnel206
  no shutdown
  description DMVPN_SPOKE
  no ip address
- no ip redirects
- ipv6 address FE80::206:13 link-local
+ ipv6 address FE80::13 link-local
  ipv6 address 2019:C0DE:200::13/64
- ipv6 nhrp map 2019:C0DE:200::1/64 2019:FEED:0:119::1
+ ipv6 enable
+ ipv6 mtu 1400
  ipv6 nhrp map multicast 2019:FEED:0:119::1
  ipv6 nhrp network-id 6
- ipv6 nhrp nhs 2019:C0DE:200::1
+ ipv6 nhrp nhs 2019:C0DE:200::1 nbma 2019:FEED:0:119::1
+ ipv6 nhrp shortcut
  ipv6 ospf 6 area 0
  ipv6 ospf network point-to-multipoint
  ipv6 ospf hello-interval 2
  ipv6 ospf dead-interval 6
- tunnel source 2019:FEED:0:1320::13
+ ipv6 ospf priority 0
+ tunnel source Ethernet0/0
  tunnel mode gre multipoint ipv6
 !
 interface Ethernet0/0
  no shutdown
  description link to R20.(zone 2-1)
  ip address 172.17.130.13 255.255.255.0
+ ipv6 address FE80::13 link-local
  ipv6 address 2019:FEED:0:1320::13/64
 !
 interface Ethernet0/1

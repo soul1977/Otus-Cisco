@@ -1,7 +1,5 @@
 
 !
-! Last configuration change at 00:56:55 DUN Sat Apr 20 2019
-!
 version 15.5
 service timestamps debug datetime msec
 service timestamps log datetime msec
@@ -82,18 +80,23 @@ interface Loopback0
  ip address 172.31.127.11 255.255.255.255
  ipv6 address FE80::11 link-local
  ipv6 address 2019:100::11/128
+ ipv6 eigrp 6
 !
 interface Ethernet0/0
  no shutdown
  description link to R12.(zone 5)
  ip address 10.5.112.11 255.255.255.0
+ ipv6 address FE80::11 link-local
  ipv6 address 2019:BEEF:0:1112::11/64
+ ipv6 eigrp 6
 !
 interface Ethernet0/1
  no shutdown
  description link to R10.(zone 5)
  ip address 10.5.101.11 255.255.255.0
+ ipv6 address FE80::11 link-local
  ipv6 address 2019:BEEF:0:1011::11/64
+ ipv6 eigrp 6
 !
 interface Ethernet0/2
  no shutdown
@@ -105,13 +108,30 @@ interface Ethernet0/3
  no shutdown
  description link to R9.(zone 5)
  ip address 10.5.91.11 255.255.255.0
+ ipv6 address FE80::11 link-local
  ipv6 address 2019:BEEF:0:911::11/64
+ ipv6 eigrp 6
+!
+!
+router eigrp 10
+ network 10.5.91.11 0.0.0.0
+ network 10.5.101.11 0.0.0.0
+ network 10.5.112.11 0.0.0.0
+ network 172.31.127.11 0.0.0.0
+ passive-interface default
+ no passive-interface Ethernet0/0
+ no passive-interface Ethernet0/1
+ no passive-interface Ethernet0/3
+ eigrp router-id 1.1.1.11
 !
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
+!
+ipv6 router eigrp 6
+ eigrp router-id 6.1.1.11
 !
 !
 !

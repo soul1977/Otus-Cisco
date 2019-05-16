@@ -1,6 +1,8 @@
 
 !
-version 15.5
+! Last configuration change at 23:09:08 DUN Mon May 13 2019
+!
+version 15.4
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
@@ -13,20 +15,11 @@ boot-end-marker
 !
 !
 no aaa new-model
-!
-!
-!
-bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
 clock timezone DUN 1 0
 mmi polling-interval 60
 no mmi auto-configure
 no mmi pvc
 mmi snmp-timeout 180
-!
-!
-!
-!
-!
 !
 !
 !
@@ -54,8 +47,6 @@ multilink bundle-name authenticated
 !
 !
 !
-cts logging verbose
-!
 !
 !
 redundancy
@@ -77,8 +68,10 @@ redundancy
 interface Loopback0
  no shutdown
  description R1 loopback.(zone 34)
- ip address 172.31.127.1 255.255.255.0
- ipv6 address 2019:100::1/64
+ ip address 172.31.127.1 255.255.255.255
+ ipv6 address FE80::1 link-local
+ ipv6 address 2019:100::1/128
+ ipv6 ospf 6 area 0
 !
 interface Tunnel19
  no shutdown
@@ -92,7 +85,12 @@ interface Tunnel19
 interface Tunnel196
  no shutdown
  no ip address
+ ipv6 address FE80::196:1 link-local
  ipv6 address 2019:C0DE:100:19::1/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf network point-to-point
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
  tunnel source 2019:FEED:0:119::1
  tunnel mode gre ipv6
  tunnel destination 2019:FEED:0:189::9
@@ -114,11 +112,18 @@ interface Tunnel206
  no shutdown
  description DMVPN_HUB
  no ip address
- no ip redirects
+ ipv6 address FE80::1 link-local
  ipv6 address 2019:C0DE:200::1/64
+ ipv6 enable
+ ipv6 mtu 1400
  ipv6 nhrp map multicast dynamic
  ipv6 nhrp network-id 6
- tunnel source 2019:FEED:0:119::1
+ ipv6 nhrp redirect
+ ipv6 ospf 6 area 0
+ ipv6 ospf network point-to-multipoint
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
+ tunnel source Ethernet0/0
  tunnel mode gre multipoint ipv6
 !
 interface Ethernet0/0
@@ -133,7 +138,11 @@ interface Ethernet0/1
  ip address 10.34.12.1 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::1 link-local
  ipv6 address 2019:F1FA:34:12::1/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/2
  no shutdown
@@ -141,7 +150,11 @@ interface Ethernet0/2
  ip address 10.34.13.1 255.255.255.0
  ip ospf dead-interval 6
  ip ospf hello-interval 2
+ ipv6 address FE80::1 link-local
  ipv6 address 2019:F1FA:34:13::1/64
+ ipv6 ospf 6 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/3
  no shutdown
@@ -149,13 +162,26 @@ interface Ethernet0/3
  no ip address
  shutdown
 !
+!
+router eigrp 10
+ network 192.100.19.1 0.0.0.0
+ network 192.200.0.1 0.0.0.0
+ redistribute ospf 10 metric 1000000 30 255 1 1500
+ passive-interface default
+ no passive-interface Tunnel19
+ no passive-interface Tunnel200
+ eigrp router-id 1.1.1.1
+ shutdown
+!
 router ospf 10
  router-id 1.1.1.1
  auto-cost reference-bandwidth 1000
+ redistribute eigrp 10 subnets
  passive-interface default
  no passive-interface Ethernet0/1
  no passive-interface Ethernet0/2
  no passive-interface Tunnel19
+ no passive-interface Tunnel196
  no passive-interface Tunnel200
  network 10.34.12.1 0.0.0.0 area 0
  network 10.34.13.1 0.0.0.0 area 0
@@ -170,9 +196,6 @@ ip forward-protocol nd
 no ip http server
 no ip http secure-server
 ip route 0.0.0.0 0.0.0.0 172.17.119.19
-ip route 10.2.0.0 255.255.0.0 192.200.0.13 name r1->R13,15,16
-ip route 10.4.0.0 255.255.0.0 192.200.0.5 name r1->R5,6,7
-ip route 10.5.0.0 255.255.0.0 192.100.19.9 name r1->R9,10,11,12
 !
 ip access-list extended icmp_acl
  permit icmp any any
@@ -181,6 +204,10 @@ ipv6 route 2019:ABBA::/32 2019:C0DE:200::13 name r1->R13,15,16
 ipv6 route 2019:BEEF::/32 2019:C0DE:100:19::9 name r1->R9,10,11,12
 ipv6 route 2019:CAFE::/32 2019:C0DE:200::5 name r1->R5,6,7
 ipv6 route ::/0 2019:FEED:0:119::19
+ipv6 router ospf 6
+ router-id 6.1.1.1
+ auto-cost reference-bandwidth 1000
+!
 !
 !
 !
