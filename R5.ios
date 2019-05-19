@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 23:23:06 DUN Tue May 14 2019
+! Last configuration change at 00:30:35 DUN Sun May 19 2019
 !
 version 15.4
 service timestamps debug datetime msec
@@ -207,13 +207,22 @@ router ospf 10
  router-id 1.1.1.5
  network 192.200.0.5 0.0.0.0 area 0
 !
+router bgp 64705
+ bgp log-neighbor-changes
+ network 10.4.0.0 mask 255.255.0.0
+ network 172.31.127.5 mask 255.255.255.255
+ network 172.31.127.6 mask 255.255.255.255
+ network 172.31.127.7 mask 255.255.255.255
+ neighbor 172.17.175.17 remote-as 64717
+ neighbor 172.17.175.17 description ISP (R17)
+!
 ip default-gateway 172.17.175.17
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
-ip route 0.0.0.0 0.0.0.0 172.17.175.17
+ip route 0.0.0.0 0.0.0.0 172.17.175.17 254
 !
 ipv6 route 2019:ABBA::/64 2019:C0DE:200::13 name r5->R13,15,16
 ipv6 route 2019:ABBA::/32 2019:C0DE:200::13 name r5->R13,15,16

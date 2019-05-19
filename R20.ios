@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 00:51:05 DUN Sat Apr 20 2019
+! Last configuration change at 11:33:26 DUN Sun May 19 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -82,43 +82,87 @@ interface Loopback0
  ip address 172.31.127.20 255.255.255.255
  ipv6 address FE80::20 link-local
  ipv6 address 2019:100::20/128
+ ipv6 ospf 600 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/0
  no shutdown
  description link to R13.(zone 1-2)
  ip address 172.17.130.20 255.255.255.0
+ ipv6 address FE80::20 link-local
  ipv6 address 2019:FEED:0:1320::20/64
 !
 interface Ethernet0/1
  no shutdown
  description link to R19.(zone 1)
  ip address 10.1.190.20 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
+ ipv6 address FE80::20 link-local
  ipv6 address 2019:B055:0:1920::20/64
+ ipv6 ospf 600 area 0
+ ipv6 ospf network point-to-point
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/2
  no shutdown
  description link to R18.(zone 1)
  ip address 10.1.180.20 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
+ ipv6 address FE80::20 link-local
  ipv6 address 2019:B055:0:1820::20/64
+ ipv6 ospf 600 area 0
+ ipv6 ospf network point-to-point
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/3
  no shutdown
  description link to R17.(zone 1)
  ip address 10.1.170.20 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
+ ipv6 address FE80::20 link-local
  ipv6 address 2019:B055:0:1720::20/64
+ ipv6 ospf 600 area 0
+ ipv6 ospf network point-to-point
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
+!
+router bgp 64720
+ bgp log-neighbor-changes
+ network 172.17.130.0 mask 255.255.255.0
+ network 172.31.127.20 mask 255.255.255.255
+ neighbor 10.1.170.17 remote-as 64717
+ neighbor 10.1.180.18 remote-as 64718
+ neighbor 10.1.190.19 remote-as 64719
+ neighbor 172.17.130.13 remote-as 64713
+ neighbor 172.17.130.13 description R13
+ neighbor 172.17.130.13 default-originate
 !
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
-ip route 172.17.119.0 255.255.255.0 10.1.190.19 name r20->r19->R1
-ip route 172.17.175.0 255.255.255.0 10.1.170.17 name r20->r17->R5
-ip route 172.17.189.0 255.255.255.0 10.1.180.18 name r20->r18->R9
+ip route 172.17.119.0 255.255.255.0 10.1.190.19 254 name r20->r19->R1
+ip route 172.17.175.0 255.255.255.0 10.1.170.17 254 name r20->r17->R5
+ip route 172.17.189.0 255.255.255.0 10.1.180.18 254 name r20->r18->R9
 !
 ipv6 route 2019:FEED:0:119::/64 2019:B055:0:1920::19 name ->r19->R1
 ipv6 route 2019:FEED:0:175::/64 2019:B055:0:1720::17 name ->r17->R5
 ipv6 route 2019:FEED:0:189::/64 2019:B055:0:1820::18 name ->r18->R9
+ipv6 router ospf 600
+ router-id 6.1.1.20
+ auto-cost reference-bandwidth 1000
+ passive-interface Ethernet0/0
+!
 !
 !
 !
