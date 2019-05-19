@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 00:51:29 DUN Sat Apr 20 2019
+! Last configuration change at 03:51:10 DUN Fri May 17 2019
 !
 version 15.5
 service timestamps debug datetime msec
@@ -88,30 +88,76 @@ interface Loopback0
  ip address 172.31.127.19 255.255.255.255
  ipv6 address FE80::19 link-local
  ipv6 address 2019:100::19/128
+ ipv6 ospf 600 area 0
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/0
  no shutdown
  description link to R1.(zone 1-34)
  ip address 172.17.119.19 255.255.255.0
+ ipv6 address FE80::19 link-local
  ipv6 address 2019:FEED:0:119::19/64
 !
 interface Ethernet0/1
  no shutdown
  description link to R20.(zone 1)
  ip address 10.1.190.19 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
+ ipv6 address FE80::19 link-local
  ipv6 address 2019:B055:0:1920::19/64
+ ipv6 ospf 600 area 0
+ ipv6 ospf network point-to-point
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/2
  no shutdown
  description link to R17.(zone 1)
  ip address 10.1.179.19 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
+ ipv6 address FE80::19 link-local
  ipv6 address 2019:B055:0:1719::19/64
+ ipv6 ospf 600 area 0
+ ipv6 ospf network point-to-point
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
 !
 interface Ethernet0/3
  no shutdown
  description link to R18.(zone 1)
  ip address 10.1.189.19 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf dead-interval 6
+ ip ospf hello-interval 2
+ ipv6 address FE80::19 link-local
  ipv6 address 2019:B055:0:1819::19/64
+ ipv6 ospf 600 area 0
+ ipv6 ospf network point-to-point
+ ipv6 ospf hello-interval 2
+ ipv6 ospf dead-interval 6
+!
+router ospf 100
+ router-id 1.1.1.19
+ auto-cost reference-bandwidth 1000
+ passive-interface default
+ no passive-interface Ethernet0/1
+ no passive-interface Ethernet0/2
+ no passive-interface Ethernet0/3
+ network 10.1.179.19 0.0.0.0 area 0
+ network 10.1.189.19 0.0.0.0 area 0
+ network 10.1.190.19 0.0.0.0 area 0
+ network 172.31.127.19 0.0.0.0 area 0
+!
+router bgp 64701
+ bgp log-neighbor-changes
+ neighbor 172.17.119.1 remote-as 64730
+ neighbor 172.17.119.1 description Zone30 (F1FA)
+ neighbor 172.17.119.1 default-originate
 !
 ip local policy route-map R19_PBR_SLA
 ip forward-protocol nd
@@ -147,11 +193,16 @@ ip sla 186
  timeout 1500
  frequency 3
 ip sla schedule 186 life forever start-time now
-ipv6 route 2019:FEED:0:175::/64 2019:B055:0:1719::17 50 name ->r17->R5
 ipv6 route 2019:FEED:0:175::/64 2019:B055:0:1819::18 10 track 186 name ->r17->R5_main
+ipv6 route 2019:FEED:0:175::/64 2019:B055:0:1719::17 50 name ->r17->R5
 ipv6 route 2019:FEED:0:189::/64 2019:B055:0:1819::18 name r19->r18->R9
-ipv6 route 2019:FEED:0:1320::/64 2019:B055:0:1920::20 50 name r19->r20->R13
 ipv6 route 2019:FEED:0:1320::/64 2019:B055:0:1819::18 10 track 186 name r19->r18->R13
+ipv6 route 2019:FEED:0:1320::/64 2019:B055:0:1920::20 50 name r19->r20->R13
+ipv6 router ospf 600
+ router-id 6.1.1.19
+ auto-cost reference-bandwidth 1000
+ passive-interface Ethernet0/0
+!
 !
 route-map R19_PBR_SLA permit 10
  match ip address acl_R19_to_R18_icmp

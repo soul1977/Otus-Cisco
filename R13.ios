@@ -1,13 +1,13 @@
 
 !
-! Last configuration change at 03:23:11 DUN Mon May 13 2019
+! Last configuration change at 03:51:31 DUN Fri May 17 2019
 !
-version 15.4
+version 15.5
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R13
+hostname R9
 !
 boot-start-marker
 boot-end-marker
@@ -15,11 +15,20 @@ boot-end-marker
 !
 !
 no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
 clock timezone DUN 1 0
 mmi polling-interval 60
 no mmi auto-configure
 no mmi pvc
 mmi snmp-timeout 180
+!
+!
+!
+!
+!
 !
 !
 !
@@ -47,6 +56,8 @@ multilink bundle-name authenticated
 !
 !
 !
+cts logging verbose
+!
 !
 !
 redundancy
@@ -67,118 +78,179 @@ redundancy
 !
 interface Loopback0
  no shutdown
- description R13 loopback.(zone 2)
- ip address 172.31.127.13 255.255.255.255
- ipv6 address FE80::13 link-local
- ipv6 address 2019:100::13/128
+ description R9 loopback.(zone 5)
+ ip address 172.31.127.9 255.255.255.255
+ ipv6 address FE80::9 link-local
+ ipv6 address 2019:100::9/128
  ipv6 ospf 6 area 0
 !
-interface Tunnel200
+interface Tunnel19
  no shutdown
- ip address 192.200.0.13 255.255.255.0
- no ip redirects
- ip nhrp map 192.200.0.1 172.17.119.1
- ip nhrp map multicast 172.17.119.1
- ip nhrp network-id 1
- ip nhrp nhs 192.200.0.1
- ip ospf network point-to-multipoint
+ ip address 192.100.19.9 255.255.255.0
+ ip ospf network point-to-point
  ip ospf dead-interval 6
  ip ospf hello-interval 2
  tunnel source Ethernet0/0
- tunnel mode gre multipoint
+ tunnel destination 172.17.119.1
 !
-interface Tunnel206
+interface Tunnel196
  no shutdown
- description DMVPN_SPOKE
  no ip address
- ipv6 address FE80::13 link-local
- ipv6 address 2019:C0DE:200::13/64
- ipv6 enable
- ipv6 mtu 1400
- ipv6 nhrp map multicast 2019:FEED:0:119::1
- ipv6 nhrp network-id 6
- ipv6 nhrp nhs 2019:C0DE:200::1 nbma 2019:FEED:0:119::1
- ipv6 nhrp shortcut
+ ipv6 address FE80::196:9 link-local
+ ipv6 address 2019:C0DE:100:19::9/64
  ipv6 ospf 6 area 0
- ipv6 ospf network point-to-multipoint
+ ipv6 ospf network point-to-point
  ipv6 ospf hello-interval 2
  ipv6 ospf dead-interval 6
- ipv6 ospf priority 0
- tunnel source Ethernet0/0
- tunnel mode gre multipoint ipv6
+ tunnel source 2019:FEED:0:189::9
+ tunnel mode gre ipv6
+ tunnel destination 2019:FEED:0:119::1
+!
+interface LISP6
+ no shutdown
 !
 interface Ethernet0/0
  no shutdown
- description link to R20.(zone 2-1)
- ip address 172.17.130.13 255.255.255.0
- ipv6 address FE80::13 link-local
- ipv6 address 2019:FEED:0:1320::13/64
+ description link to R18.(zone 5-1)
+ ip address 172.17.189.9 255.255.255.0
+ ipv6 address 2019:FEED:0:189::9/64
 !
 interface Ethernet0/1
  no shutdown
- description link to R16.(zone 2)
- ip address 10.2.136.13 255.255.255.0
- ip ospf dead-interval 6
- ip ospf hello-interval 2
- ipv6 address FE80::13 link-local
- ipv6 address 2019:ABBA:0:1316::13/64
- ipv6 ospf 6 area 0
- ipv6 ospf hello-interval 2
- ipv6 ospf dead-interval 6
+ description link to R12.(zone 5)
+ ip address 10.5.92.9 255.255.255.0
+ ipv6 address FE80::9 link-local
+ ipv6 address 2019:BEEF:0:912::9/64
 !
 interface Ethernet0/2
  no shutdown
- description link to R15.(zone 2)
- ip address 10.2.135.13 255.255.255.0
- ip ospf dead-interval 6
- ip ospf hello-interval 2
- ipv6 address FE80::13 link-local
- ipv6 address 2019:ABBA:0:1315::13/64
- ipv6 ospf 6 area 0
- ipv6 ospf hello-interval 2
- ipv6 ospf dead-interval 6
+ description link to R10.(zone 5)
+ ip address 10.5.90.9 255.255.255.0
+ ipv6 address FE80::9 link-local
+ ipv6 address 2019:BEEF:0:910::9/64
 !
 interface Ethernet0/3
  no shutdown
- description #N/A
- no ip address
- shutdown
+ description link to R11.(zone 5)
+ ip address 10.5.91.9 255.255.255.0
+ ipv6 address FE80::9 link-local
+ ipv6 address 2019:BEEF:0:911::9/64
+!
+!
+router eigrp ZONE4
+ !
+ address-family ipv4 unicast autonomous-system 10
+  !
+  af-interface default
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Tunnel19
+   summary-address 10.5.0.0 255.255.0.0
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/1
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/2
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/3
+   no passive-interface
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 10 metric 1000000 30 255 1 1500
+  exit-af-topology
+  neighbor 192.200.0.5 Tunnel19 remote 2 lisp-encap 6 
+  network 10.5.90.9 0.0.0.0
+  network 10.5.91.9 0.0.0.0
+  network 10.5.92.9 0.0.0.0
+  network 172.31.127.9 0.0.0.0
+  network 192.100.19.9 0.0.0.0
+  eigrp router-id 1.1.1.9
+ exit-address-family
+!
+!
+router eigrp ZONE6
+ !
+ address-family ipv6 unicast autonomous-system 6
+  !
+  af-interface default
+   shutdown
+  exit-af-interface
+  !
+  af-interface Loopback0
+   no shutdown
+  exit-af-interface
+  !
+  af-interface Tunnel196
+   summary-address 2019:BEEF::/48
+   no shutdown
+  exit-af-interface
+  !
+  af-interface Ethernet0/1
+   no shutdown
+  exit-af-interface
+  !
+  af-interface Ethernet0/2
+   no shutdown
+  exit-af-interface
+  !
+  af-interface Ethernet0/3
+   no shutdown
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 6 metric 1000000 30 255 1 1500
+  exit-af-topology
+  neighbor 2019:C0DE:200::5 Tunnel196 remote 2 lisp-encap 6 
+  eigrp router-id 6.1.1.9
+ exit-address-family
 !
 router ospf 10
- router-id 1.1.1.13
- priority 100
+ router-id 1.1.1.9
  auto-cost reference-bandwidth 1000
  passive-interface default
  no passive-interface Ethernet0/1
  no passive-interface Ethernet0/2
- no passive-interface Tunnel200
- network 10.2.135.13 0.0.0.0 area 0
- network 10.2.136.13 0.0.0.0 area 0
- network 172.31.127.13 0.0.0.0 area 0
- network 192.200.0.13 0.0.0.0 area 0
+ no passive-interface Ethernet0/3
+ no passive-interface Loopback0
+ no passive-interface Tunnel19
+ no passive-interface Tunnel196
+ network 10.5.90.9 0.0.0.0 area 0
+ network 10.5.91.9 0.0.0.0 area 0
+ network 10.5.92.9 0.0.0.0 area 0
+ network 172.31.127.9 0.0.0.0 area 0
+ network 192.100.19.9 0.0.0.0 area 0
 !
-ip default-gateway 172.17.130.20
+router bgp 64705
+ bgp log-neighbor-changes
+ network 10.5.0.0 mask 255.255.0.0
+ neighbor 172.17.189.18 remote-as 64701
+ neighbor 172.17.189.18 description ISP (b055)
+ auto-summary
+!
+ip default-gateway 172.17.189.18
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
-ip route 0.0.0.0 0.0.0.0 172.17.130.20
-ip route 10.4.0.0 255.255.0.0 192.200.0.5 name r13->R5,6,7
-ip route 10.5.0.0 255.255.0.0 192.200.0.1 name r13->R9,10,11,12
-ip route 10.32.0.0 255.252.0.0 192.200.0.1 name r13->R1,2,3,4_R3,8,14_R22,23,24_R2,24
-ip route 192.100.19.0 255.255.255.0 192.200.0.1 name r13->GRE_R1-R9
+ip route 0.0.0.0 0.0.0.0 172.17.189.18 254
 !
-ipv6 route 2019:BEEF::/64 2019:C0DE:200::1 name r13->R9,10,11,12
-ipv6 route 2019:BEEF::/32 2019:C0DE:200::1 name r13->R9,10,11,12
-ipv6 route 2019:C0DE:100:19::/64 2019:C0DE:200::1 name r13->GRE_R1-R9
-ipv6 route 2019:CAFE::/64 2019:C0DE:200::5 name r13->R5,6,7
-ipv6 route 2019:CAFE::/32 2019:C0DE:200::5 name r13->R5,6,7
-ipv6 route 2019:F1FA::/32 2019:C0DE:200::1 name r13->R1,2,3,4_R3,8,14_R22,23,24_R2,24
-ipv6 route ::/0 2019:FEED:0:1320::20
+ipv6 route 2019:ABBA::/64 2019:C0DE:100:19::1 name r9->R13,15,16
+ipv6 route 2019:ABBA::/32 2019:C0DE:100:19::1 name r9->R13,15,16
+ipv6 route 2019:C0DE:200::/64 2019:C0DE:100:19::1 name r9->DMVPN_R1-R5,13
+ipv6 route 2019:CAFE::/64 2019:C0DE:100:19::1 name r9->R5,6,7
+ipv6 route 2019:CAFE::/32 2019:C0DE:100:19::1 name r9->R5,6,7
+ipv6 route 2019:F1FA::/32 2019:C0DE:100:19::1 name r9->R1,2,3,4_R3,8,14_R22,23,24_R2,24
+ipv6 route ::/0 2019:FEED:0:189::18
 ipv6 router ospf 6
- router-id 6.1.1.13
- auto-cost reference-bandwidth 1000
+ router-id 6.1.1.9
 !
 !
 !
